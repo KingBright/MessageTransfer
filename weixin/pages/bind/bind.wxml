@@ -1,0 +1,10 @@
+<!--bind.wxml-->
+<view class="container">
+  <view class="section phone">
+    <input type="number" placeholder="请输入号码" auto-focus/>
+    <button>验证</button>
+  </view>
+  <view class="section code">
+    <input type="text" placeholder="请输入收到的验证码" class="code"/>
+  </view>
+</view>

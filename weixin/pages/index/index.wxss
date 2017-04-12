@@ -16,7 +16,7 @@
   color: #aaa;
 }
 
-.usermotto {
+.message {
   margin-top: 180px;
 }
 
