@@ -1,7 +1,7 @@
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 
 
-class SimpleEcho(WebSocket):
+class MessageHandler(WebSocket):
     def handleMessage(self):
         # echo message back to client
         print(self.data)
