@@ -58,7 +58,13 @@ public class WebSocketManager {
         }
         if (!mClient.isOpen() && !mClient.isConnecting()) {
             Log.d(TAG, "start to connect");
-            mClient.connect();
+            try {
+                mClient.connect();
+            } catch (IllegalStateException e) {
+                mClient = null;
+                Log.d(TAG, "can't reuse, recreate");
+                start();
+            }
         }
     }
 

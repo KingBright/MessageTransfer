@@ -2,6 +2,7 @@ package name.kingbright.messagetransfer.util;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.v4.content.PermissionChecker;
 import android.telephony.TelephonyManager;
 
 import com.thomashaertel.device.identification.DeviceIdentityProvider;
@@ -29,5 +30,14 @@ public class SystemUtil {
             return telephonyManager.getLine1Number();
         }
         return "";
+    }
+
+    public static boolean checkPermission(Context context, String permission) {
+        int result = PermissionChecker.checkCallingOrSelfPermission(context, permission);
+        if (result == PermissionChecker.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
