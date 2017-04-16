@@ -1,6 +1,5 @@
 package name.kingbright.messagetransfer.util;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -15,9 +14,9 @@ public class L {
         d(DEFAULT_TAG, message);
     }
 
-    public static void d(String tag, String message) {
-        if (!TextUtils.isEmpty(message)) {
-            Log.d(tag, message);
+    public static void d(String tag, Object message) {
+        if (message != null) {
+            Log.d(tag, message.toString());
         } else {
             Log.d(tag, "##EmptyMessage##");
         }

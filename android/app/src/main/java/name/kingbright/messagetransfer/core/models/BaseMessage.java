@@ -4,7 +4,7 @@ package name.kingbright.messagetransfer.core.models;
  * Created by jinliang on 2017/4/14.
  */
 
-class AbsMessage {
+public class BaseMessage {
     /**
      * 该手机的号码
      */

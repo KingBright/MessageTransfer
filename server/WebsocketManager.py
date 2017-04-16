@@ -1,11 +1,14 @@
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
+import messagehandler
 
 
 class MessageHandler(WebSocket):
     def handleMessage(self):
-        # echo message back to client
-        print(self.data)
-        self.sendMessage(self.data)
+        print('received message', self.data)
+        try:
+            messagehandler.handle(self, self.data)
+        except Exception as exc:
+            print(exc)
 
     def handleConnected(self):
         print(self.address, 'connected')
@@ -14,5 +17,5 @@ class MessageHandler(WebSocket):
         print(self.address, 'closed')
 
 
-server = SimpleWebSocketServer('172.23.167.112', 8442, SimpleEcho)
+server = SimpleWebSocketServer('192.168.199.200', 8442, MessageHandler)
 server.serveforever()

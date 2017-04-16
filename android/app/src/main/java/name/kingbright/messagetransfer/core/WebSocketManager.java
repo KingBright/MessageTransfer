@@ -4,15 +4,25 @@ import android.util.Log;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.channels.NotYetConnectedException;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import name.kingbright.messagetransfer.util.L;
 
 /**
  * Created by jinliang on 2017/4/13.
  */
 
 public class WebSocketManager {
+
+    private State mState = State.Waiting;
+
+    private enum State {
+        Waiting,
+        Success,
+        Fail
+    }
+
     private SimpleWebSocketClient mClient;
     private static final String TAG = "WebSocketManager";
 
@@ -21,6 +31,7 @@ public class WebSocketManager {
             .WebSocketListener() {
         @Override
         public void onOpen() {
+            updateState(State.Success);
             String message;
             while ((message = mMessage.poll()) != null) {
                 sendMessage(message);
@@ -29,32 +40,49 @@ public class WebSocketManager {
 
         @Override
         public void onClose() {
-
+            updateState(State.Fail);
         }
 
         @Override
         public void onError() {
-
+            updateState(State.Fail);
         }
 
         @Override
         public void onMessage(String message) {
-
+            EventBus.publish(new SocketMessage(message));
         }
     };
+
+    private void updateState(State state) {
+        synchronized (WebSocketManager.class) {
+            mState = state;
+        }
+    }
+
+    private State getState() {
+        return mState;
+    }
+
+    private boolean isSuccess() {
+        return mState == State.Success;
+    }
+
+    private boolean isWaiting() {
+        return mState == State.Waiting;
+    }
 
     public WebSocketManager() {
     }
 
     public void start() {
-        if (mClient == null) {
-            try {
-                mClient = new SimpleWebSocketClient(new URI("wss://ssl.kingbright.name:443"));
-                mClient.setWebSocketListener(mWebSocketListener);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                return;
-            }
+        try {
+            L.d(TAG, "create new instance");
+            mClient = new SimpleWebSocketClient(new URI("ws://192.168.199.200:8442"));
+            mClient.setWebSocketListener(mWebSocketListener);
+        } catch (URISyntaxException e) {
+            Log.d(TAG, "fail to create socket");
+            return;
         }
         if (!mClient.isOpen() && !mClient.isConnecting()) {
             Log.d(TAG, "start to connect");
@@ -62,8 +90,8 @@ public class WebSocketManager {
                 mClient.connect();
             } catch (IllegalStateException e) {
                 mClient = null;
-                Log.d(TAG, "can't reuse, recreate");
-                start();
+                mState = State.Fail;
+                Log.d(TAG, "can't reuse, recreate later");
             }
         }
     }
@@ -75,26 +103,33 @@ public class WebSocketManager {
      * @return True if immediately, otherwise false.
      */
     public boolean sendMessage(String message) {
-        if (mClient.isOpen()) {
+        if (isWaiting()) {
+            enqueue(message, false);
+            return false;
+        } else if (isSuccess()) {
             Log.d(TAG, "send immediately");
-            try {
-                mClient.send(message);
-            } catch (NotYetConnectedException e) {
-                e.printStackTrace();
-                enqueue(message);
-                return false;
-            }
+            sendMessageInner(message);
             return true;
         } else {
-            enqueue(message);
+            enqueue(message, true);
             return false;
         }
     }
 
-    private void enqueue(String message) {
+    private void sendMessageInner(String message) {
+        try {
+            mClient.send(message);
+        } catch (Throwable throwable) {
+            enqueue(message, false);
+        }
+    }
+
+    private void enqueue(String message, boolean tryStart) {
         Log.d(TAG, "send later");
         mMessage.offer(message);
-        start();
+        if (tryStart) {
+            start();
+        }
     }
 
     public void stop() {

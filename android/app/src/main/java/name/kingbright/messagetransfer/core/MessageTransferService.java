@@ -7,12 +7,10 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
-import android.telephony.SmsMessage;
 
-import name.kingbright.messagetransfer.core.models.NormalMessage;
+import name.kingbright.messagetransfer.core.models.WrapperMessage;
 import name.kingbright.messagetransfer.util.JsonUtil;
 import name.kingbright.messagetransfer.util.L;
-import name.kingbright.messagetransfer.util.SystemUtil;
 
 /**
  * Created by jinliang on 2017/4/13.
@@ -21,6 +19,7 @@ import name.kingbright.messagetransfer.util.SystemUtil;
 public class MessageTransferService extends Service {
     private static final String TAG = "MessageTransferService";
     private WebSocketManager mWebSocketManager;
+    private MessageFactory mMessageFactory;
 
     @Nullable
     @Override
@@ -31,12 +30,25 @@ public class MessageTransferService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mMessageFactory = MessageFactory.getInstance(getContext());
         mWebSocketManager = new WebSocketManager();
         mWebSocketManager.start();
+
+        EventBus.subscribe(this);
+    }
+
+    public void onEventMainThread(SocketMessage message) {
+        L.d(TAG, "received from server");
+        WrapperMessage wrapperMessage = mMessageFactory.buildFromSocketMessage(message);
+        L.d(TAG, wrapperMessage.type);
+        L.d(TAG, wrapperMessage.message);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            return super.onStartCommand(intent, flags, startId);
+        }
         String action = intent.getAction();
         if (Intents.ACTION_MESSAGE_TRANSFER.equals(action)) {
             Intent smsIntent = intent.getParcelableExtra("intent");
@@ -61,7 +73,7 @@ public class MessageTransferService extends Service {
     private void handleSmsIntent(Intent intent) {
         String action = intent.getAction();
         if (isValidAction(action)) {
-            SmsMessage[] messages;
+            android.telephony.SmsMessage[] messages;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 messages = getMessagesFromIntent(intent);
             } else {
@@ -69,7 +81,7 @@ public class MessageTransferService extends Service {
             }
 
             if (messages != null && messages.length != 0) {
-                for (SmsMessage sms : messages) {
+                for (android.telephony.SmsMessage sms : messages) {
                     if (sms != null) {
                         syncMessage(sms);
                     }
@@ -78,19 +90,14 @@ public class MessageTransferService extends Service {
         }
     }
 
-    private void syncMessage(SmsMessage sms) {
+    private void syncMessage(android.telephony.SmsMessage sms) {
         String message = transformToSocketMessage(sms);
         mWebSocketManager.sendMessage(message);
     }
 
-    private String transformToSocketMessage(SmsMessage sms) {
-        NormalMessage message = new NormalMessage();
-        message.model = SystemUtil.getPhoneModel();
-        message.deviceId = SystemUtil.getDeviceId(getContext());
-        message.phone = SystemUtil.getPhoneNumber(getContext());
-
-        message.sender = sms.getDisplayOriginatingAddress();
-        message.body = sms.getDisplayMessageBody();
+    private String transformToSocketMessage(android.telephony.SmsMessage sms) {
+        WrapperMessage message = mMessageFactory.buildSmsMessage(sms.getDisplayOriginatingAddress(), sms
+                .getDisplayMessageBody(), sms.getTimestampMillis());
 
         String json = JsonUtil.toJson(message);
         L.d(TAG, "message : " + json);
@@ -105,6 +112,7 @@ public class MessageTransferService extends Service {
     public void onDestroy() {
         super.onDestroy();
         mWebSocketManager.stop();
+        EventBus.unsubscribe(this);
     }
 
     /**
@@ -114,13 +122,13 @@ public class MessageTransferService extends Service {
      * @param intent the intent to read from
      * @return an array of SmsMessages for the PDUs
      */
-    private SmsMessage[] getMessagesFromIntent(Intent intent) {
+    private android.telephony.SmsMessage[] getMessagesFromIntent(Intent intent) {
         Object[] messages = (Object[]) intent.getSerializableExtra("pdus");
         int pduCount = messages.length;
-        SmsMessage[] msgs = new SmsMessage[pduCount];
+        android.telephony.SmsMessage[] msgs = new android.telephony.SmsMessage[pduCount];
         for (int i = 0; i < pduCount; i++) {
             byte[] pdu = (byte[]) messages[i];
-            msgs[i] = SmsMessage.createFromPdu(pdu);
+            msgs[i] = android.telephony.SmsMessage.createFromPdu(pdu);
         }
         return msgs;
     }
