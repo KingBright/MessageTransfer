@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
 
+import name.kingbright.messagetransfer.Constants;
 import name.kingbright.messagetransfer.core.models.SmsMessage;
 import name.kingbright.messagetransfer.core.models.WrapperMessage;
 import name.kingbright.messagetransfer.util.L;
@@ -18,7 +19,7 @@ import name.kingbright.messagetransfer.util.L;
 
 public class MessageTransferService extends Service {
     private static final String TAG = "MessageTransferService";
-    private WebSocketManager mWebSocketManager;
+    private AbsWebSocketManager mWebSocketManager;
     private MessageFactory mMessageFactory;
 
     @Nullable
@@ -31,7 +32,8 @@ public class MessageTransferService extends Service {
     public void onCreate() {
         super.onCreate();
         mMessageFactory = MessageFactory.getInstance(getContext());
-        mWebSocketManager = new WebSocketManager();
+        mWebSocketManager = new WebSocketManagerImpl();
+        mWebSocketManager.setUrl(Constants.WSS_SERVER);
         mWebSocketManager.start();
 
         EventBus.subscribe(this);

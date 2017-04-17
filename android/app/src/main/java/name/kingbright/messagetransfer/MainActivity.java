@@ -13,9 +13,10 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import name.kingbright.messagetransfer.core.AbsWebSocketManager;
 import name.kingbright.messagetransfer.core.InboxSmsReader;
 import name.kingbright.messagetransfer.core.MessageFactory;
-import name.kingbright.messagetransfer.core.WebSocketManager;
+import name.kingbright.messagetransfer.core.WebSocketManagerImpl;
 import name.kingbright.messagetransfer.core.models.SmsMessage;
 import name.kingbright.messagetransfer.util.SystemUtil;
 
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "Main";
     private int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
 
-    private WebSocketManager websocketManager;
+    private AbsWebSocketManager mWebSocketManager;
 
     private InboxSmsReader mInboxSmsReader;
     private MessageFactory mMessageFactory;
@@ -38,8 +39,9 @@ public class MainActivity extends AppCompatActivity {
         mInboxSmsReader = new InboxSmsReader(getContext());
         mMessageFactory = MessageFactory.getInstance(getContext());
 
-        websocketManager = new WebSocketManager();
-        websocketManager.start();
+        mWebSocketManager = new WebSocketManagerImpl();
+        mWebSocketManager.setUrl(Constants.WSS_SERVER);
+        mWebSocketManager.start();
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 if (list.size() > 0) {
                     String msg = mMessageFactory.wrapToString(list.get(0));
                     Log.d(TAG, "latest sms is : " + msg);
-                    websocketManager.sendMessage(msg);
+                    mWebSocketManager.sendMessage(msg);
                 }
             }
         });
