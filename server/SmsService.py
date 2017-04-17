@@ -3,11 +3,14 @@ import DbService
 
 def add_new_sms(message):
     try:
-        phone = DbService.get_phone(message)
+        phone, result = DbService.get_phone(message)
+        print(phone)
         try:
-            sms, result = DbService.get_sms(message, phone.did)
+            sms, result = DbService.get_sms(phone.id, message)
             return result, "Successfully inserted the sms."
-        except:
+        except Exception as exc:
+            print(exc)
             return False, "Failed to insert sms."
-    except:
+    except Exception as exc:
+        print(exc)
         return False, "This phone can not be registered."

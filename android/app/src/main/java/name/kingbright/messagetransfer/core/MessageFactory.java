@@ -27,27 +27,33 @@ public class MessageFactory {
         mContext = context;
     }
 
-    public WrapperMessage buildSmsMessage(String sender, String body, long time) {
+    public SmsMessage buildSmsMessage(String sender, String body, long time) {
         SmsMessage smsMessage = new SmsMessage();
         appendBasicInfo(smsMessage);
         smsMessage.sender = sender;
         smsMessage.body = body;
         smsMessage.sign = Base64Util.endcode(sender + ":" + body);
         smsMessage.time = time;
+        return smsMessage;
+    }
 
+    public WrapperMessage wrap(BaseMessage message) {
         WrapperMessage wrapperMessage = getWrapperMessage(Type.Sms);
-        wrapperMessage.message = JsonUtil.toJson(smsMessage);
+        wrapperMessage.message = JsonUtil.toJson(message);
         return wrapperMessage;
     }
 
-    public WrapperMessage buildBindMessage(String weiXinId) {
+    public String wrapToString(BaseMessage message) {
+        WrapperMessage wrapperMessage = getWrapperMessage(Type.Sms);
+        wrapperMessage.message = JsonUtil.toJson(message);
+        return JsonUtil.toJson(wrapperMessage);
+    }
+
+    public BindMessage buildBindMessage(String weiXinId) {
         BindMessage bindMessage = new BindMessage();
         appendBasicInfo(bindMessage);
         bindMessage.weiXinId = weiXinId;
-
-        WrapperMessage wrapperMessage = getWrapperMessage(Type.Bind);
-        wrapperMessage.message = JsonUtil.toJson(bindMessage);
-        return wrapperMessage;
+        return bindMessage;
     }
 
     public WrapperMessage buildFromSocketMessage(SocketMessage socketMessage) {
@@ -87,7 +93,7 @@ public class MessageFactory {
 
     private void appendBasicInfo(BaseMessage message) {
         message.model = SystemUtil.getPhoneModel();
-        message.deviceId = SystemUtil.getDeviceId(mContext);
+        message.did = SystemUtil.getDeviceId(mContext);
         message.phone = SystemUtil.getPhoneNumber(mContext);
     }
 }

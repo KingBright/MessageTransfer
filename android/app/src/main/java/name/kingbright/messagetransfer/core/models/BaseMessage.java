@@ -16,5 +16,5 @@ public class BaseMessage {
     /**
      * 设备id
      */
-    public String deviceId;
+    public String did;
 }

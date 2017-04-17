@@ -1,8 +1,6 @@
 from peewee import *
 from playhouse.sqlite_ext import SqliteExtDatabase
 
-db = SqliteExtDatabase('message_transfer.db')
-
 
 class Phone(Model):
     id = PrimaryKeyField(unique=True)
@@ -44,15 +42,13 @@ class Sms(Model):
 
 
 def get_phone(message):
-    phone = Phone.get_phone(message.deviceId, message.phone, message.model)
-    return phone
+    return Phone.get_phone(message.did, message.phone, message.model)
 
 
-def get_sms(message, did):
-    sms = Sms.get_sms(did, message.sender, message.body, message.time)
-    return sms
+def get_sms(did, message):
+    return Sms.get_sms(did, message.sender, message.body, message.time)
 
 
-def __init__():
-    db.connect()
-    db.create_tables([Phone, Sms], safe=True)
+db = SqliteExtDatabase('message_transfer.db')
+db.connect()
+db.create_tables([Phone, Sms], safe=True)

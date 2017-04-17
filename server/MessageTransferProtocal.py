@@ -34,11 +34,12 @@ class BaseMessage(object):
     def __init__(self):
         self.phone = None
         self.model = None
-        self.deviceId = None
+        self.did = None
 
 
 class BindMessage(BaseMessage):
     def __init__(self):
+        BaseMessage.__init__(self)
         self.weiXinId = None
         self.code = None
 
@@ -51,6 +52,7 @@ class BindResponseMessage(object):
 
 class SmsMessage(BaseMessage):
     def __init__(self):
+        BaseMessage.__init__(self)
         self.sender = None
         self.body = None
         self.sign = None
@@ -58,7 +60,7 @@ class SmsMessage(BaseMessage):
 
 
 class SmsResponseMessage(object):
-    def __init__(self, code, sign, msg=""):
-        self.code = code
+    def __init__(self, sign, code, msg=""):
         self.sign = sign
+        self.code = code
         self.msg = msg

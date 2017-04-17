@@ -8,8 +8,8 @@ import android.os.IBinder;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
 
+import name.kingbright.messagetransfer.core.models.SmsMessage;
 import name.kingbright.messagetransfer.core.models.WrapperMessage;
-import name.kingbright.messagetransfer.util.JsonUtil;
 import name.kingbright.messagetransfer.util.L;
 
 /**
@@ -96,10 +96,10 @@ public class MessageTransferService extends Service {
     }
 
     private String transformToSocketMessage(android.telephony.SmsMessage sms) {
-        WrapperMessage message = mMessageFactory.buildSmsMessage(sms.getDisplayOriginatingAddress(), sms
+        SmsMessage message = mMessageFactory.buildSmsMessage(sms.getDisplayOriginatingAddress(), sms
                 .getDisplayMessageBody(), sms.getTimestampMillis());
 
-        String json = JsonUtil.toJson(message);
+        String json = mMessageFactory.wrapToString(message);
         L.d(TAG, "message : " + json);
         return json;
     }

@@ -6,7 +6,7 @@ class MessageHandler(WebSocket):
     def handleMessage(self):
         print('received message', self.data)
         try:
-            messagehandler.handle(self, self.data)
+            messagehandler.handle(self.sendMessage, self.data)
         except Exception as exc:
             print(exc)
 
@@ -17,5 +17,5 @@ class MessageHandler(WebSocket):
         print(self.address, 'closed')
 
 
-server = SimpleWebSocketServer('192.168.199.200', 8442, MessageHandler)
+server = SimpleWebSocketServer('0.0.0.0', 8442, MessageHandler)
 server.serveforever()

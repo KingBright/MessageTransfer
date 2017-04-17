@@ -78,7 +78,7 @@ public class WebSocketManager {
     public void start() {
         try {
             L.d(TAG, "create new instance");
-            mClient = new SimpleWebSocketClient(new URI("ws://192.168.199.200:8442"));
+            mClient = new SimpleWebSocketClient(new URI("ws://172.23.167.112:8442"));
             mClient.setWebSocketListener(mWebSocketListener);
         } catch (URISyntaxException e) {
             Log.d(TAG, "fail to create socket");
