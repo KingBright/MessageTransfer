@@ -24,6 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <service
             android:name=".core.MessageTransferService"
             android:enabled="true">
@@ -31,6 +32,7 @@
                 <action android:name="name.kingbright.ACTION_MESSAGE_TRANSFER"/>
             </intent-filter>
         </service>
+
         <receiver
             android:name=".core.MessageReceiver"
             android:enabled="true">

@@ -12,7 +12,7 @@ def check_bind_state(message):
             return code, "Please submit the verification code on your WeiXin."
         else:
             print("already binded")
-            return 0, "Your phone has already been binded."
+            return -1, "Your phone has already been binded."
     except Exception as exc:
         print(exc)
-        return 0, "Oops, this phone can not be registered."
+        return -1, "Oops, this phone can not be registered."
