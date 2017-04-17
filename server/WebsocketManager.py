@@ -17,5 +17,5 @@ class MessageHandler(WebSocket):
         print(self.address, 'closed')
 
 
-server = SimpleWebSocketServer('0.0.0.0', 8442, MessageHandler)
+server = SimpleWebSocketServer('127.0.0.1', 8442, MessageHandler)
 server.serveforever()
