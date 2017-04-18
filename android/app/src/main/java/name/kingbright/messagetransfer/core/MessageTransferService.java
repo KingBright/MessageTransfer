@@ -100,6 +100,7 @@ public class MessageTransferService extends Service {
     private String transformToSocketMessage(android.telephony.SmsMessage sms) {
         SmsMessage message = mMessageFactory.buildSmsMessage(sms.getDisplayOriginatingAddress(), sms
                 .getDisplayMessageBody(), sms.getTimestampMillis());
+        message.sender = InboxSmsReader.getSenderNameByNumber(getContentResolver(), message.sender);
 
         String json = mMessageFactory.wrapToString(message);
         L.d(TAG, "message : " + json);
