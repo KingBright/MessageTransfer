@@ -12,4 +12,8 @@ public class SmsResponseMessage {
      */
     public String sign;
     public String msg;
+
+    public boolean isSuccess() {
+        return code == 0;
+    }
 }

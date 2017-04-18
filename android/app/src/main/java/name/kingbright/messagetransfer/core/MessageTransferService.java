@@ -7,10 +7,16 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import name.kingbright.messagetransfer.Constants;
+import name.kingbright.messagetransfer.core.models.BindMessage;
+import name.kingbright.messagetransfer.core.models.BindResponseMessage;
 import name.kingbright.messagetransfer.core.models.SmsMessage;
+import name.kingbright.messagetransfer.core.models.SmsResponseMessage;
+import name.kingbright.messagetransfer.core.models.Type;
 import name.kingbright.messagetransfer.core.models.WrapperMessage;
+import name.kingbright.messagetransfer.db.SmsOpenHelper;
 import name.kingbright.messagetransfer.util.L;
 
 /**
@@ -22,6 +28,8 @@ public class MessageTransferService extends Service {
     private AbsWebSocketManager mWebSocketManager;
     private MessageFactory mMessageFactory;
 
+    private SmsOpenHelper mSmsOpenHelper;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -32,6 +40,8 @@ public class MessageTransferService extends Service {
     public void onCreate() {
         super.onCreate();
         mMessageFactory = MessageFactory.getInstance(getContext());
+        mSmsOpenHelper = SmsOpenHelper.getInstance(getContext());
+
         mWebSocketManager = new WebSocketManagerImpl();
         mWebSocketManager.setUrl(Constants.WSS_SERVER);
         mWebSocketManager.start();
@@ -42,8 +52,23 @@ public class MessageTransferService extends Service {
     public void onEventMainThread(SocketMessage message) {
         L.d(TAG, "received from server");
         WrapperMessage wrapperMessage = mMessageFactory.buildFromSocketMessage(message);
-        L.d(TAG, wrapperMessage.type);
-        L.d(TAG, wrapperMessage.message);
+        Type type = Type.fromCode(wrapperMessage.type);
+        if (type == Type.BindResponse) {
+            BindResponseMessage bindMessage = mMessageFactory.getBindResponseMessage(wrapperMessage);
+            if (bindMessage.isSuccess()) {
+                Log.d(TAG, "verification code is : " + bindMessage.code);
+            } else {
+                Log.d(TAG, "verification msg : " + bindMessage.msg);
+            }
+        } else if (type == Type.SmsResponse) {
+            SmsResponseMessage smsResponseMessage = mMessageFactory.getSmsResponseMessage(wrapperMessage);
+            if (smsResponseMessage.isSuccess()) {
+                Log.d(TAG, "sms confirmed : " + smsResponseMessage.sign);
+                mSmsOpenHelper.updateToSynced(smsResponseMessage.sign);
+            } else {
+                Log.d(TAG, "sms error message : " + smsResponseMessage.msg);
+            }
+        }
     }
 
     @Override
@@ -53,18 +78,20 @@ public class MessageTransferService extends Service {
         }
         String action = intent.getAction();
         if (Intents.ACTION_MESSAGE_TRANSFER.equals(action)) {
-            Intent smsIntent = intent.getParcelableExtra("intent");
+            Intent smsIntent = intent.getParcelableExtra(Intents.EXTRA_INTENT);
             if (smsIntent != null) {
                 handleSmsIntent(smsIntent);
             }
-        } else if (Intents.ACTION_REGISTER.equals(action)) {
-            doRegister();
+        } else if (Intents.ACTION_BIND.equals(action)) {
+            String weiXinId = intent.getStringExtra(Intents.EXTRA_WEIXIN_ID);
+            doBind(weiXinId);
         }
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void doRegister() {
-
+    private void doBind(String weiXinId) {
+        BindMessage message = mMessageFactory.buildBindMessage(weiXinId);
+        mWebSocketManager.sendMessage(mMessageFactory.wrapToString(message));
     }
 
     private boolean isValidAction(String action) {
@@ -93,18 +120,18 @@ public class MessageTransferService extends Service {
     }
 
     private void syncMessage(android.telephony.SmsMessage sms) {
-        String message = transformToSocketMessage(sms);
-        mWebSocketManager.sendMessage(message);
+        SmsMessage message = transformToSocketMessage(sms);
+        mSmsOpenHelper.insertOrUpdate(message);
+        String json = mMessageFactory.wrapToString(message);
+        L.d(TAG, "message : " + json);
+        mWebSocketManager.sendMessage(json);
     }
 
-    private String transformToSocketMessage(android.telephony.SmsMessage sms) {
+    private SmsMessage transformToSocketMessage(android.telephony.SmsMessage sms) {
         SmsMessage message = mMessageFactory.buildSmsMessage(sms.getDisplayOriginatingAddress(), sms
                 .getDisplayMessageBody(), sms.getTimestampMillis());
         message.sender = InboxSmsReader.getSenderNameByNumber(getContentResolver(), message.sender);
-
-        String json = mMessageFactory.wrapToString(message);
-        L.d(TAG, "message : " + json);
-        return json;
+        return message;
     }
 
     private Context getContext() {

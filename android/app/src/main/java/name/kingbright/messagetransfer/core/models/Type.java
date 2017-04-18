@@ -9,7 +9,7 @@ public enum Type {
     Bind(21),
     BindResponse(22),
     Sms(31),
-    SmsResponse(32),;
+    SmsResponse(32);
 
     private final int code;
 

@@ -1,5 +1,7 @@
 package name.kingbright.messagetransfer.core.models;
 
+import android.text.TextUtils;
+
 /**
  * @author Jin Liang
  * @since 2017/4/16
@@ -11,4 +13,8 @@ public class BindResponseMessage {
      */
     public String code;
     public String msg;
+
+    public boolean isSuccess() {
+        return !TextUtils.isEmpty(code) && code.length() == 4;
+    }
 }

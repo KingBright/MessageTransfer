@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
  */
 
 public class Base64Util {
-    public static String endcode(String txt) {
+    public static String encode(String txt) {
         try {
             byte[] bytes = txt.getBytes("UTF-8");
             return Base64.encodeToString(bytes, Base64.DEFAULT);

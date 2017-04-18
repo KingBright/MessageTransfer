@@ -32,8 +32,8 @@ public class MessageFactory {
         appendBasicInfo(smsMessage);
         smsMessage.sender = sender;
         smsMessage.body = body;
-        smsMessage.sign = Base64Util.endcode(sender + ":" + body);
         smsMessage.time = time;
+        smsMessage.sign = Base64Util.encode(sender + "://" + body + "@" + time);
         return smsMessage;
     }
 
@@ -43,8 +43,14 @@ public class MessageFactory {
         return wrapperMessage;
     }
 
-    public String wrapToString(BaseMessage message) {
+    public String wrapToString(SmsMessage message) {
         WrapperMessage wrapperMessage = getWrapperMessage(Type.Sms);
+        wrapperMessage.message = JsonUtil.toJson(message);
+        return JsonUtil.toJson(wrapperMessage);
+    }
+
+    public String wrapToString(BindMessage message) {
+        WrapperMessage wrapperMessage = getWrapperMessage(Type.Bind);
         wrapperMessage.message = JsonUtil.toJson(message);
         return JsonUtil.toJson(wrapperMessage);
     }

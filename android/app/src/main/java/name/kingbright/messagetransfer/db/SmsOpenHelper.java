@@ -5,10 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import name.kingbright.messagetransfer.core.models.SmsMessage;
 
 public class SmsOpenHelper extends SQLiteOpenHelper {
+    private static final String TAG = "SmsOpenHelper";
+
     private static final int DATABASE_VERSION = 1;
 
     private static final String DATABASE_NAME = "message_transfer";
@@ -20,7 +23,6 @@ public class SmsOpenHelper extends SQLiteOpenHelper {
     private static final String SIGN = "sign";
     private static final String TIME = "time";
     private static final String STATE = "state";
-
 
     private static final String TABLE_CREATE = "CREATE TABLE " + SMS_TABLE_NAME + " ("
             + ID + " LONG, "
@@ -34,7 +36,16 @@ public class SmsOpenHelper extends SQLiteOpenHelper {
     private static final int UN_SYNCED = 0;
     private static final int SYNCED = 1;
 
-    public SmsOpenHelper(Context context) {
+    private static SmsOpenHelper instance;
+
+    public static SmsOpenHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new SmsOpenHelper(context);
+        }
+        return instance;
+    }
+
+    private SmsOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -53,28 +64,46 @@ public class SmsOpenHelper extends SQLiteOpenHelper {
         ContentValues values = convertToContentValues(message, UN_SYNCED);
 
         if (checkRowExistence(db, values)) {
-            update(db, values);
+            int result = update(db, values);
+            if (result > 0) {
+                Log.d(TAG, "successfully updated sms");
+            } else {
+                Log.d(TAG, "failed to update");
+            }
         } else {
-            insert(db, values);
+            long id = insert(db, values);
+            if (id == -1) {
+                Log.d(TAG, "failed to insert");
+            } else {
+                Log.d(TAG, "successfully inserted sms");
+            }
         }
     }
 
-    public void updateToSynced(SmsMessage message) {
+    public void updateToSynced(String sign) {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = convertToContentValues(message, SYNCED);
+        ContentValues values = new ContentValues();
+        values.put(STATE, SYNCED);
+        values.put(SIGN, sign);
         if (checkRowExistence(db, values)) {
-            update(db, values);
+            int result = update(db, values);
+            if (result > 0) {
+                Log.d(TAG, "set sms synced");
+            } else {
+                Log.d(TAG, "failed to set synced");
+            }
         } else {
-            insert(db, values);
+            Log.d(TAG, "no local record to update");
         }
     }
 
-    private void update(SQLiteDatabase db, ContentValues values) {
-        db.update(SMS_TABLE_NAME, values, SIGN + "=?", new String[]{values.getAsString(SIGN)});
+    private int update(SQLiteDatabase db, ContentValues values) {
+        return db.update(SMS_TABLE_NAME, values, SIGN + "=?", new String[]{values.getAsString
+                (SIGN)});
     }
 
-    private void insert(SQLiteDatabase db, ContentValues values) {
-        db.insert(SMS_TABLE_NAME, null, values);
+    private long insert(SQLiteDatabase db, ContentValues values) {
+        return db.insert(SMS_TABLE_NAME, null, values);
     }
 
     private boolean checkRowExistence(SQLiteDatabase db, ContentValues values) {

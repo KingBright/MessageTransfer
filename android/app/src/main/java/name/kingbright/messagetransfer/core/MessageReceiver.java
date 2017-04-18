@@ -25,7 +25,7 @@ public class MessageReceiver extends BroadcastReceiver {
         if (SystemUtil.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
             Intent serviceIntent = new Intent(context, MessageTransferService.class);
             serviceIntent.setAction(Intents.ACTION_MESSAGE_TRANSFER);
-            serviceIntent.putExtra("intent", intent);
+            serviceIntent.putExtra(Intents.EXTRA_INTENT, intent);
             context.startService(serviceIntent);
         }
     }
