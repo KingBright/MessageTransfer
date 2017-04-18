@@ -5,8 +5,7 @@ import SmsService
 
 
 def handle_bind_request(send, message):
-    bind_message = MessageFactory.get_bind_message(message)
-    code, msg = BindService.check_bind_state(bind_message)
+    code, msg = BindService.check_bind_state(message)
     response_message = MessageFactory.build_bind_response_message(code, msg)
     send(response_message)
 
@@ -18,7 +17,7 @@ def handle_sms_request(send, message):
     else:
         code = -1
 
-    response_message = MessageFactory.build_sms_response_message(message.sign, msg, code)
+    response_message = MessageFactory.build_sms_response_message(message.sign, code, msg)
     send(response_message)
 
 
