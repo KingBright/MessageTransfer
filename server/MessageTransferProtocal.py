@@ -22,6 +22,15 @@ class Source(Enum):
     Phone = 2
     Server = 3
 
+    @classmethod
+    def get_source(cls, source_code):
+        if source_code == 1:
+            return Source.WeiXin
+        elif source_code == 2:
+            return Source.Phone
+        else:
+            return None
+
 
 class WrapperMessage(object):
     def __init__(self):
@@ -42,6 +51,7 @@ class BindMessage(BaseMessage):
         BaseMessage.__init__(self)
         self.weiXinId = None
         self.code = None
+        self.phone = None
 
 
 class BindResponseMessage(object):

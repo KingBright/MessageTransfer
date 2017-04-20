@@ -7,6 +7,18 @@
   <view class="message">
     <text>{{message}}</text>
   </view>
+  <view class="section phone">
+    <label>手机号</label>
+    <input type="number" placeholder="请输入号码" auto-focus/>
+  </view>
+  <view class="section code">
+    <label>验证码</label>
+    <input type="text" placeholder="请输入收到的验证码" class="code"/>
+  </view>
+  <view class="section">
+    <button bindtap="doBind">确认绑定</button>
+  </view>
+
   <view bindtap="toBind" class="bind">
     <button type="primary">{{button}}</button>
   </view>

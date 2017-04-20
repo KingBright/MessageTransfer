@@ -4,8 +4,14 @@ import BindService
 import SmsService
 
 
-def handle_bind_request(send, message):
-    code, msg = BindService.check_bind_state(message)
+def handle_phone_bind_request(send, message):
+    code, msg = BindService.check_phone_bind_state(message)
+    response_message = MessageFactory.build_bind_response_message(code, msg)
+    send(response_message)
+
+
+def handle_weixin_bind_request(send, message):
+    code, msg = BindService.check_weixin_bind_state(message)
     response_message = MessageFactory.build_bind_response_message(code, msg)
     send(response_message)
 
@@ -27,11 +33,18 @@ def handle(send, data):
     print('source', wrapper_message.source)
 
     message_type = Type.get_type(wrapper_message.type)
+    message_source = Source.get_source(wrapper_message.source)
     if message_type is Type.Bind:
-        handle_bind_request(send, MessageFactory.get_bind_message(wrapper_message.message))
-        return
+        if message_source == Source.Phone:
+            handle_phone_bind_request(send,
+                                      MessageFactory.get_bind_message(wrapper_message.message))
+        elif message_source == Source.WeiXin:
+            handle_weixin_bind_request(send,
+                                       MessageFactory.get_bind_message(wrapper_message.message))
     elif message_type is Type.Sms:
-        handle_sms_request(send, MessageFactory.get_sms_message(wrapper_message.message))
-        return
+        if message_source is Source.Phone:
+            handle_sms_request(send, MessageFactory.get_sms_message(wrapper_message.message))
+        elif message_source is Source.WeiXin:
+            pass
     else:
         print("unrecognized type:", message_type)
