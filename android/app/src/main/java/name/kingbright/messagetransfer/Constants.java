@@ -7,4 +7,6 @@ package name.kingbright.messagetransfer;
 
 public class Constants {
     public static final String WSS_SERVER = "wss://ssl.kingbright.name/ws";
+
+    public static final String KEY_BIND_STATE = "key_bind_state";
 }

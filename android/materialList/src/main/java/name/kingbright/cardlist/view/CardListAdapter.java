@@ -94,7 +94,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
      * @param card     to insert.
      */
     public void add(final int position, @NonNull final Card card) {
-        add(position, card, true);
+        add(position, card, false);
     }
 
     /**

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import name.kingbright.cardlist.OnDismissCallback;
@@ -64,11 +65,18 @@ public class MessageListFragment extends android.support.v4.app.Fragment {
 
         List<SmsMessage> messages = readSms();
         L.d(TAG, "message list size : " + messages.size());
+        List<Card> cardList = new ArrayList<>();
         for (SmsMessage message : messages) {
             Card card = new Card.Builder().withProvider(new SmsCardProvider(message)).build();
-
-            mListAdapter.add(card);
+            cardList.add(card);
         }
+        mListAdapter.addAll(cardList);
+
+        checkBindState();
+    }
+
+    private void checkBindState() {
+
     }
 
     private List<SmsMessage> readSms() {
