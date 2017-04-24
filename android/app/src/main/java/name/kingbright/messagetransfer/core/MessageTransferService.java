@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import name.kingbright.messagetransfer.Constants;
 import name.kingbright.messagetransfer.core.models.BindMessage;
@@ -17,6 +18,7 @@ import name.kingbright.messagetransfer.core.models.Type;
 import name.kingbright.messagetransfer.core.models.WrapperMessage;
 import name.kingbright.messagetransfer.db.SmsOpenHelper;
 import name.kingbright.messagetransfer.util.L;
+import name.kingbright.messagetransfer.util.MatcherUtil;
 
 /**
  * Created by jinliang on 2017/4/13.
@@ -129,7 +131,14 @@ public class MessageTransferService extends Service {
     private SmsMessage transformToSocketMessage(android.telephony.SmsMessage sms) {
         SmsMessage message = mMessageFactory.buildSmsMessage(sms.getDisplayOriginatingAddress(), sms
                 .getDisplayMessageBody(), sms.getTimestampMillis());
-        message.sender = InboxSmsReader.getSenderNameByNumber(getContentResolver(), message.sender);
+        String name = InboxSmsReader.getSenderNameByNumber(getContentResolver(), message.sender);
+        if (TextUtils.isEmpty(name)) {
+            name = MatcherUtil.findFirstMatch(message.body);
+            if (TextUtils.isEmpty(name)) {
+                name = message.sender;
+            }
+        }
+        message.sender = name;
         return message;
     }
 
