@@ -1,4 +1,4 @@
-package com.dexafree.materialList.view;
+package name.kingbright.cardlist.view;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -11,13 +11,13 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.dexafree.materialList.R;
-import com.dexafree.materialList.card.Card;
-import com.dexafree.materialList.listeners.OnDismissCallback;
-import com.dexafree.materialList.listeners.RecyclerItemClickListener;
-import com.dexafree.materialList.listeners.SwipeDismissRecyclerViewTouchListener;
+import name.kingbright.cardlist.card.Card;
+import name.kingbright.cardlist.OnDismissCallback;
+import name.kingbright.cardlist.RecyclerItemClickListener;
+import name.kingbright.cardlist.SwipeDismissRecyclerViewTouchListener;
 
 
-public class MaterialListView extends RecyclerView {
+public class CardListView extends RecyclerView {
 
     private static final int DEFAULT_COLUMNS_PORTRAIT = 1;
     private static final int DEFAULT_COLUMNS_LANDSCAPE = 2;
@@ -35,15 +35,15 @@ public class MaterialListView extends RecyclerView {
         }
     };
 
-    public MaterialListView(Context context) {
+    public CardListView(Context context) {
         this(context, null);
     }
 
-    public MaterialListView(Context context, AttributeSet attrs) {
+    public CardListView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public MaterialListView(Context context, AttributeSet attrs, int defStyle) {
+    public CardListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         mDismissListener = new SwipeDismissRecyclerViewTouchListener(this,
@@ -71,7 +71,7 @@ public class MaterialListView extends RecyclerView {
         setOnTouchListener(mDismissListener);
         setOnScrollListener(mDismissListener.makeScrollListener());
 
-        setAdapter(new MaterialListAdapter(new OnSwipeAnimation() {
+        setAdapter(new CardListAdapter(new OnSwipeAnimation() {
             @Override
             public void animate(final int position) {
                 RecyclerView.ViewHolder holder = findViewHolderForPosition(position);
@@ -120,7 +120,7 @@ public class MaterialListView extends RecyclerView {
         }
     }
 
-    public <T extends MaterialListAdapter> void setAdapter(@NonNull final T adapter) {
+    public <T extends CardListAdapter> void setAdapter(@NonNull final T adapter) {
         final RecyclerView.Adapter oldAdapter = getAdapter();
         if (oldAdapter != null) {
             oldAdapter.unregisterAdapterDataObserver(mEmptyViewObserver);
@@ -130,8 +130,8 @@ public class MaterialListView extends RecyclerView {
     }
 
     @Override
-    public MaterialListAdapter getAdapter() {
-        return (MaterialListAdapter) super.getAdapter();
+    public CardListAdapter getAdapter() {
+        return (CardListAdapter) super.getAdapter();
     }
 
     public int getColumnCount() {

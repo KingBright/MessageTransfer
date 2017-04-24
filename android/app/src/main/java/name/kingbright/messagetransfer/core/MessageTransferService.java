@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Telephony;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import name.kingbright.messagetransfer.Constants;
 import name.kingbright.messagetransfer.core.models.BindMessage;
@@ -56,17 +55,17 @@ public class MessageTransferService extends Service {
         if (type == Type.BindResponse) {
             BindResponseMessage bindMessage = mMessageFactory.getBindResponseMessage(wrapperMessage);
             if (bindMessage.isSuccess()) {
-                Log.d(TAG, "verification code is : " + bindMessage.code);
+                L.d(TAG, "verification code is : " + bindMessage.code);
             } else {
-                Log.d(TAG, "verification msg : " + bindMessage.msg);
+                L.d(TAG, "verification msg : " + bindMessage.msg);
             }
         } else if (type == Type.SmsResponse) {
             SmsResponseMessage smsResponseMessage = mMessageFactory.getSmsResponseMessage(wrapperMessage);
             if (smsResponseMessage.isSuccess()) {
-                Log.d(TAG, "sms confirmed : " + smsResponseMessage.sign);
+                L.d(TAG, "sms confirmed : " + smsResponseMessage.sign);
                 mSmsOpenHelper.updateToSynced(smsResponseMessage.sign);
             } else {
-                Log.d(TAG, "sms error message : " + smsResponseMessage.msg);
+                L.d(TAG, "sms error message : " + smsResponseMessage.msg);
             }
         }
     }

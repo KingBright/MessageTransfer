@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dexafree.materialList.listeners;
+package name.kingbright.cardlist;
 
 import android.graphics.Rect;
 import android.os.SystemClock;

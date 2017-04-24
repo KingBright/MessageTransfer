@@ -5,9 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import name.kingbright.messagetransfer.core.models.SmsMessage;
+import name.kingbright.messagetransfer.util.L;
 
 public class SmsOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = "SmsOpenHelper";
@@ -66,16 +66,16 @@ public class SmsOpenHelper extends SQLiteOpenHelper {
         if (checkRowExistence(db, values)) {
             int result = update(db, values);
             if (result > 0) {
-                Log.d(TAG, "successfully updated sms");
+                L.d(TAG, "successfully updated sms");
             } else {
-                Log.d(TAG, "failed to update");
+                L.d(TAG, "failed to update");
             }
         } else {
             long id = insert(db, values);
             if (id == -1) {
-                Log.d(TAG, "failed to insert");
+                L.d(TAG, "failed to insert");
             } else {
-                Log.d(TAG, "successfully inserted sms");
+                L.d(TAG, "successfully inserted sms");
             }
         }
     }
@@ -88,12 +88,12 @@ public class SmsOpenHelper extends SQLiteOpenHelper {
         if (checkRowExistence(db, values)) {
             int result = update(db, values);
             if (result > 0) {
-                Log.d(TAG, "set sms synced");
+                L.d(TAG, "set sms synced");
             } else {
-                Log.d(TAG, "failed to set synced");
+                L.d(TAG, "failed to set synced");
             }
         } else {
-            Log.d(TAG, "no local record to update");
+            L.d(TAG, "no local record to update");
         }
     }
 

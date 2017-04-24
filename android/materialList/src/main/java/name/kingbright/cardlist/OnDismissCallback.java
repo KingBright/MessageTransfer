@@ -1,8 +1,8 @@
-package com.dexafree.materialList.listeners;
+package name.kingbright.cardlist;
 
 import android.support.annotation.NonNull;
 
-import com.dexafree.materialList.card.Card;
+import name.kingbright.cardlist.card.Card;
 
 /**
  * The OnDismissCallback will be notified if a Card is dismissed.

@@ -9,12 +9,13 @@ import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.support.v4.content.ContentResolverCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import name.kingbright.messagetransfer.core.models.SmsMessage;
+import name.kingbright.messagetransfer.util.L;
+import name.kingbright.messagetransfer.util.MatcherUtil;
 
 /**
  * @author Jin Liang
@@ -53,11 +54,11 @@ public class InboxSmsReader {
         if (cursor.moveToFirst()) {
             String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             if (TextUtils.isEmpty(name)) {
-                return number;
+                return "";
             }
             return name;
         }
-        return number;
+        return "";
     }
 
     public List<SmsMessage> getSmsInboxWithLimit(int limit) {
@@ -81,7 +82,15 @@ public class InboxSmsReader {
                     String body = cursor.getString(bodyIndex);
                     long date = cursor.getLong(dateIndex);
                     String name = getSenderNameByNumber(mContentResolver, address);
-                    Log.d(TAG, "address : " + address);
+                    if (TextUtils.isEmpty(name)) {
+                        L.d(TAG, "content : " + body);
+                        name = MatcherUtil.findFirstMatch(body);
+                        L.d(TAG, "find name from content : " + name);
+                        if (TextUtils.isEmpty(name)) {
+                            name = address;
+                        }
+                    }
+                    L.d(TAG, "address : " + address);
                     list.add(mMessageFactory.buildSmsMessage(name, body, date));
                 } while (cursor.moveToNext());
 

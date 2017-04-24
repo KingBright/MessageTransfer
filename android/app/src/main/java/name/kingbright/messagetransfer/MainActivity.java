@@ -10,17 +10,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
-import java.util.List;
-
-import name.kingbright.messagetransfer.core.InboxSmsReader;
 import name.kingbright.messagetransfer.core.Intents;
 import name.kingbright.messagetransfer.core.MessageTransferService;
-import name.kingbright.messagetransfer.core.models.SmsMessage;
-import name.kingbright.messagetransfer.ui.InfoListFragment;
-import name.kingbright.messagetransfer.util.JsonUtil;
+import name.kingbright.messagetransfer.ui.MessageListFragment;
+import name.kingbright.messagetransfer.util.L;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,7 +44,7 @@ public class MainActivity extends AppCompatActivity
     private void initHomeFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        InfoListFragment infoListFragment = new InfoListFragment();
+        MessageListFragment infoListFragment = new MessageListFragment();
         fragmentTransaction.replace(R.id.fragment_container, infoListFragment, infoListFragment.getTag());
         fragmentTransaction.commit();
     }
@@ -59,15 +54,6 @@ public class MainActivity extends AppCompatActivity
         intent.setAction(Intents.ACTION_BIND);
         intent.putExtra(Intents.EXTRA_WEIXIN_ID, weiXinId);
         startService(intent);
-    }
-
-    private void readSms() {
-        InboxSmsReader reader = new InboxSmsReader(getApplicationContext());
-        List<SmsMessage> list = reader.getSmsInboxWithLimit(1);
-        if (list.size() > 0) {
-            SmsMessage message = list.get(0);
-            Log.d(TAG, JsonUtil.toJson(message));
-        }
     }
 
     @Override
@@ -84,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        Log.d(TAG, "onNavigationItemSelected : " + item.getTitle());
+        L.d(TAG, "onNavigationItemSelected : " + item.getTitle());
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {

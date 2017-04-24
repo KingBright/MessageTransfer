@@ -1,8 +1,8 @@
-package com.dexafree.materialList.card.event;
+package name.kingbright.cardlist.card.event;
 
 import android.support.annotation.NonNull;
 
-import com.dexafree.materialList.card.Card;
+import name.kingbright.cardlist.card.Card;
 
 public class DismissEvent {
     private final Card mCard;

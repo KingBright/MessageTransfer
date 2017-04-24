@@ -1,15 +1,14 @@
-package com.dexafree.materialList.view;
+package name.kingbright.cardlist.view;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.dexafree.materialList.card.Card;
-import com.dexafree.materialList.card.CardLayout;
-import com.dexafree.materialList.card.event.DismissEvent;
+import com.dexafree.materialList.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,35 +17,42 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class MaterialListAdapter extends RecyclerView.Adapter<MaterialListAdapter.ViewHolder>
+import name.kingbright.cardlist.card.Card;
+import name.kingbright.cardlist.card.event.DismissEvent;
+
+public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHolder>
         implements Observer {
-    private final MaterialListView.OnSwipeAnimation mSwipeAnimation;
-    private final MaterialListView.OnAdapterItemsChanged mItemAnimation;
+    private final CardListView.OnSwipeAnimation mSwipeAnimation;
+    private final CardListView.OnAdapterItemsChanged mItemAnimation;
     private final List<Card> mCardList = new ArrayList<>();
 
-    public MaterialListAdapter(@NonNull final MaterialListView.OnSwipeAnimation swipeAnimation,
-                               @NonNull final MaterialListView.OnAdapterItemsChanged itemAnimation) {
+    public CardListAdapter(@NonNull final CardListView.OnSwipeAnimation swipeAnimation,
+                           @NonNull final CardListView.OnAdapterItemsChanged itemAnimation) {
         mSwipeAnimation = swipeAnimation;
         mItemAnimation = itemAnimation;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final CardLayout view;
+        private View contentView;
 
-        public ViewHolder(ViewGroup parent, @NonNull final View view) {
-            super(view);
-            this.view = (CardLayout) view;
+        public ViewHolder(CardView cardView, View contentView) {
+            super(cardView);
+            this.contentView = contentView;
         }
 
         public void build(Card card) {
-            view.build(card);
+            if (card != null && card.getProvider() != null) {
+                card.getProvider().bindView(contentView);
+            }
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, final int viewId) {
-
-        return new ViewHolder(LayoutInflater.from(parent.getContext(), parent);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        CardView cardView = (CardView) inflater.inflate(R.layout.card_layout, parent, false);
+        View contentView = inflater.inflate(viewId, cardView, true);
+        return new ViewHolder(cardView, contentView);
     }
 
     @Override
@@ -63,7 +69,7 @@ public class MaterialListAdapter extends RecyclerView.Adapter<MaterialListAdapte
     public int getItemViewType(final int position) {
         Card card = getCard(position);
         if (card != null) {
-            return card.getViewHodler().getViewId();
+            return card.getProvider().getViewId();
         }
         return 0;
     }
@@ -130,14 +136,18 @@ public class MaterialListAdapter extends RecyclerView.Adapter<MaterialListAdapte
         }
     }
 
+    public void remove(@NonNull final Card card, boolean animate) {
+        remove(card, animate, false);
+    }
+
     /**
      * Remove a Card withProvider or without an animation.
      *
      * @param card    to remove.
      * @param animate {@code true} to animate the remove process or {@code false} otherwise.
      */
-    public void remove(@NonNull final Card card, boolean animate) {
-        if (card.isDismissible()) {
+    public void remove(@NonNull final Card card, boolean animate, boolean force) {
+        if (force || card.isDismissible()) {
             if (animate) {
                 mSwipeAnimation.animate(getPosition(card));
             } else {
@@ -149,19 +159,18 @@ public class MaterialListAdapter extends RecyclerView.Adapter<MaterialListAdapte
     }
 
     /**
-     * Clears the list from all Cards (even if they are not dismissable).
+     * Clears the list from all Cards (even if they are not dismissible).
      */
-    public void clearAll() {
+    public void forceClear() {
         while (!mCardList.isEmpty()) {
             final Card card = mCardList.get(0);
-            card.setDismissible(true);
-            remove(card, false);
+            remove(card, false, true);
             notifyItemRemoved(0);
         }
     }
 
     /**
-     * Clears the list from all Cards (only if dismissable).
+     * Clears the list from all Cards (only if dismissible).
      */
     public void clear() {
         for (int index = 0; index < mCardList.size(); ) {

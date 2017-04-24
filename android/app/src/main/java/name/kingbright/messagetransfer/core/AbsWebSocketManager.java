@@ -1,9 +1,9 @@
 package name.kingbright.messagetransfer.core;
 
-import android.util.Log;
-
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import name.kingbright.messagetransfer.util.L;
 
 /**
  * Created by jinliang on 2017/4/13.
@@ -18,7 +18,7 @@ public abstract class AbsWebSocketManager implements IWebSocketManager {
     private WebSocketListener mWebSocketListener = new WebSocketListener() {
         @Override
         public void onOpen() {
-            Log.d(TAG, "on open");
+            L.d(TAG, "on open");
             updateState(State.Success);
             String message;
             while ((message = mMessage.poll()) != null) {
@@ -28,19 +28,19 @@ public abstract class AbsWebSocketManager implements IWebSocketManager {
 
         @Override
         public void onClose() {
-            Log.d(TAG, "on close");
+            L.d(TAG, "on close");
             updateState(State.Close);
         }
 
         @Override
         public void onError() {
-            Log.d(TAG, "on error");
+            L.d(TAG, "on error");
             updateState(State.Fail);
         }
 
         @Override
         public void onMessage(String message) {
-            Log.d(TAG, "message received : " + message);
+            L.d(TAG, "message received : " + message);
             EventBus.publish(new SocketMessage(message));
         }
     };
@@ -102,7 +102,7 @@ public abstract class AbsWebSocketManager implements IWebSocketManager {
             return false;
         } else if (isSuccess()) {
             try {
-                Log.d(TAG, "try send immediately");
+                L.d(TAG, "try send immediately");
                 sendMessageInner(message);
                 return true;
             } catch (Exception e) {
@@ -119,7 +119,7 @@ public abstract class AbsWebSocketManager implements IWebSocketManager {
     protected abstract void sendMessageInner(String message);
 
     protected final void enqueue(String message, boolean tryStart) {
-        Log.d(TAG, "send later");
+        L.d(TAG, "send later");
         mMessage.offer(message);
         if (tryStart) {
             start();

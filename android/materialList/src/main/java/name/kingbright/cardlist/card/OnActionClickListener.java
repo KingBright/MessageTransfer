@@ -1,4 +1,4 @@
-package com.dexafree.materialList.card;
+package name.kingbright.cardlist.card;
 
 import android.view.View;
 
@@ -9,10 +9,8 @@ public interface OnActionClickListener {
     /**
      * An action view is clicked.
      *
-     * @param view
-     *         which was clicked.
-     * @param card
-     *         where the view was clicked on.
+     * @param view which was clicked.
+     * @param card where the view was clicked on.
      */
     void onActionClicked(View view, Card card);
 }
