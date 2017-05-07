@@ -1,7 +1,9 @@
 package name.kingbright.cardlist.card.provider;
 
+import android.content.Context;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.util.Log;
 import android.view.View;
 
 import com.dexafree.materialList.R;
@@ -12,6 +14,7 @@ import java.util.HashMap;
  * Provide view and content and other customizable things.
  */
 public abstract class CardProvider<T> {
+    private static final String TAG = "CardProvider";
     private T mData;
 
     private HashMap<Integer, View> mViewCache = new HashMap<>();
@@ -37,6 +40,21 @@ public abstract class CardProvider<T> {
      */
     public boolean isDismissible() {
         return true;
+    }
+
+    /**
+     * 点击回调
+     */
+    public void onClick() {
+        Log.d(TAG, "onClick");
+    }
+
+    /**
+     * 长按回调
+     */
+    public boolean onLongClick() {
+        Log.d(TAG, "onLongClick");
+        return false;
     }
 
     /**
@@ -71,6 +89,13 @@ public abstract class CardProvider<T> {
             mViewCache.put(id, childView);
         }
         return childView;
+    }
+
+    public Context getContext() {
+        if (mContentView != null) {
+            return mContentView.getContext();
+        }
+        return null;
     }
 
 }

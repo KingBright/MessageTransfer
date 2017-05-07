@@ -12,22 +12,21 @@
         android:textSize="17sp"/>
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
         android:layout_marginTop="8dp"
-        android:ellipsize="end"
-        android:maxLines="2"
         android:textColor="@color/color_666"
         android:textSize="15sp"/>
 
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/color_666"
-        android:textSize="14sp"/>
+        android:layout_alignBottom="@id/message"
+        android:layout_alignTop="@id/title"
+        android:background="@color/white"
+        android:visibility="gone"/>
 </RelativeLayout>

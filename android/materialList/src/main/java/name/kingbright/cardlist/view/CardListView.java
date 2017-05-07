@@ -11,10 +11,10 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.dexafree.materialList.R;
-import name.kingbright.cardlist.card.Card;
+
 import name.kingbright.cardlist.OnDismissCallback;
-import name.kingbright.cardlist.RecyclerItemClickListener;
 import name.kingbright.cardlist.SwipeDismissRecyclerViewTouchListener;
+import name.kingbright.cardlist.card.Card;
 
 
 public class CardListView extends RecyclerView {
@@ -29,7 +29,8 @@ public class CardListView extends RecyclerView {
     private int mColumnCountLandscape = DEFAULT_COLUMNS_LANDSCAPE;
     private int mColumnCountPortrait = DEFAULT_COLUMNS_PORTRAIT;
     private final AdapterDataObserver mEmptyViewObserver = new AdapterDataObserver() {
-        @Override public void onChanged() {
+        @Override
+        public void onChanged() {
             super.onChanged();
             checkIfEmpty();
         }
@@ -68,6 +69,7 @@ public class CardListView extends RecyclerView {
                         }
                     }
                 });
+
         setOnTouchListener(mDismissListener);
         setOnScrollListener(mDismissListener.makeScrollListener());
 
@@ -167,13 +169,6 @@ public class CardListView extends RecyclerView {
         checkIfEmpty();
     }
 
-    public void addOnItemClickListener(RecyclerItemClickListener.OnItemClickListener listener) {
-        RecyclerItemClickListener itemClickListener =
-                new RecyclerItemClickListener(getContext(), listener);
-        itemClickListener.setRecyclerView(this);
-        addOnItemTouchListener(itemClickListener);
-    }
-
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -212,7 +207,6 @@ public class CardListView extends RecyclerView {
      */
     interface OnSwipeAnimation {
         /**
-         *
          * @param position
          */
         void animate(final int position);
@@ -223,7 +217,6 @@ public class CardListView extends RecyclerView {
      */
     interface OnAdapterItemsChanged {
         /**
-         *
          * @param position
          * @param scroll
          */

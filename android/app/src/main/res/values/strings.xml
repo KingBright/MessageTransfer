@@ -1,9 +1,24 @@
 <resources>
     <string name="app_name">MessageTransfer</string>
-    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_main2">MainActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!-- 绑定 -->
+    <string name="status_not_bind">尚未绑定微信号</string>
+    <string name="status_binded">已绑定</string>
+    <string name="click_to_bind">点击去绑定</string>
+    <string name="bind_title">绑定微信账号</string>
+    <string name="bind_hint">请输入微信账号</string>
+    <string name="confirm_bind">绑定</string>
+    <string name="bind_success">已成功绑定</string>
+    <string name="bind_soon_please">请根据下方验证码在微信小程序上完成绑定操作</string>
+    <string name="verification_code_is">验证码是：%s</string>
+    <string name="bind_success_message">赶快打开小程序查看短信吧</string>
+    <string name="bind_fail">出错了</string>
+    <string name="bind_fail_message">请稍后再试</string>
+    <string name="weixin_id_is_empty">微信号不能为空</string>
 </resources>

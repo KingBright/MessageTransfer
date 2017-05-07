@@ -7,7 +7,8 @@ package name.kingbright.messagetransfer.core.models;
 
 public enum Source {
     WeiXin(1),
-    Phone(2);
+    Phone(2),
+    Server(3);
 
     private final int code;
 

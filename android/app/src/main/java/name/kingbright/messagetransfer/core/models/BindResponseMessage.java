@@ -17,4 +17,12 @@ public class BindResponseMessage {
     public boolean isSuccess() {
         return !TextUtils.isEmpty(code) && code.length() == 4;
     }
+
+    public boolean isFail() {
+        return "-1".equals(code);
+    }
+
+    public boolean isBinded() {
+        return "0".equals(code);
+    }
 }

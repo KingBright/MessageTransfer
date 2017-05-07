@@ -56,11 +56,7 @@ public class MessageTransferService extends Service {
         Type type = Type.fromCode(wrapperMessage.type);
         if (type == Type.BindResponse) {
             BindResponseMessage bindMessage = mMessageFactory.getBindResponseMessage(wrapperMessage);
-            if (bindMessage.isSuccess()) {
-                L.d(TAG, "verification code is : " + bindMessage.code);
-            } else {
-                L.d(TAG, "verification msg : " + bindMessage.msg);
-            }
+            EventBus.publish(bindMessage);
         } else if (type == Type.SmsResponse) {
             SmsResponseMessage smsResponseMessage = mMessageFactory.getSmsResponseMessage(wrapperMessage);
             if (smsResponseMessage.isSuccess()) {

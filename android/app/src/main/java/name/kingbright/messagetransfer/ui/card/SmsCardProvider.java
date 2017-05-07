@@ -2,6 +2,8 @@ package name.kingbright.messagetransfer.ui.card;
 
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import name.kingbright.cardlist.card.provider.CardProvider;
 import name.kingbright.messagetransfer.R;
 import name.kingbright.messagetransfer.core.models.SmsMessage;
@@ -37,4 +39,13 @@ public class SmsCardProvider extends CardProvider<SmsMessage> {
         content.setText(data.body);
         time.setText(TimeUtils.format(data.time));
     }
+
+    @Override
+    public void onClick() {
+        SmsMessage message = getData();
+        new MaterialDialog.Builder(getContext())
+                .title(message.sender).content(message.body + "\n\n" + TimeUtils.format(message
+                .time)).build().show();
+    }
 }
+

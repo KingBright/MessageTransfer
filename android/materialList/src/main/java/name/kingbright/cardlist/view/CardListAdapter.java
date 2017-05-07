@@ -32,18 +32,37 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
         mItemAnimation = itemAnimation;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private View contentView;
+        private Card card;
 
         public ViewHolder(CardView cardView, View contentView) {
             super(cardView);
             this.contentView = contentView;
+            cardView.setOnClickListener(this);
+            cardView.setOnLongClickListener(this);
         }
 
         public void build(Card card) {
+            this.card = card;
             if (card != null && card.getProvider() != null) {
                 card.getProvider().bindView(contentView);
             }
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (card != null && card.getProvider() != null) {
+                card.getProvider().onClick();
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (card != null && card.getProvider() != null) {
+                return card.getProvider().onLongClick();
+            }
+            return false;
         }
     }
 
