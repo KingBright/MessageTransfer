@@ -1,5 +1,6 @@
 package name.kingbright.messagetransfer.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,7 +17,11 @@ import name.kingbright.cardlist.view.CardListAdapter;
 import name.kingbright.cardlist.view.CardListView;
 import name.kingbright.messagetransfer.Constants;
 import name.kingbright.messagetransfer.R;
+import name.kingbright.messagetransfer.core.EventBus;
 import name.kingbright.messagetransfer.core.InboxSmsReader;
+import name.kingbright.messagetransfer.core.Intents;
+import name.kingbright.messagetransfer.core.MessageTransferService;
+import name.kingbright.messagetransfer.core.models.BindResponseMessage;
 import name.kingbright.messagetransfer.core.models.SmsMessage;
 import name.kingbright.messagetransfer.ui.card.BindCardProvider;
 import name.kingbright.messagetransfer.ui.card.SmsCardProvider;
@@ -66,15 +71,9 @@ public class MessageListFragment extends android.support.v4.app.Fragment {
     }
 
     private void checkBindState() {
-        BindCardProvider.BindInfo bindInfo = StorageUtil.get(Constants.KEY_BIND_STATE, null);
-        if (bindInfo == null) {
-            bindInfo = new BindCardProvider.BindInfo();
-            bindInfo.title = getString(R.string.status_not_bind);
-            bindInfo.message = getString(R.string.click_to_bind);
-            bindInfo.status = BindCardProvider.BindInfo.STATUS_UNBIND;
-        }
-
-        mListAdapter.add(0, new Card.Builder().withProvider(new BindCardProvider(bindInfo)).build());
+        Intent intent = new Intent(getContext(), MessageTransferService.class);
+        intent.setAction(Intents.ACTION_BIND);
+        getContext().startService(intent);
     }
 
     private List<SmsMessage> readSms() {
@@ -86,6 +85,26 @@ public class MessageListFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.subscribe(this);
     }
 
+    public void onEventMainThread(BindResponseMessage message) {
+        if (message.isUnbind()) {
+            BindCardProvider.BindInfo bindInfo = StorageUtil.get(Constants.KEY_BIND_STATE, null);
+            if (bindInfo == null) {
+                bindInfo = new BindCardProvider.BindInfo();
+                bindInfo.title = getString(R.string.status_not_bind);
+                bindInfo.message = getString(R.string.click_to_bind);
+                bindInfo.status = BindCardProvider.BindInfo.STATUS_UNBIND;
+            }
+
+            mListAdapter.add(0, new Card.Builder().withProvider(new BindCardProvider(bindInfo)).build());
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.unsubscribe(this);
+    }
 }

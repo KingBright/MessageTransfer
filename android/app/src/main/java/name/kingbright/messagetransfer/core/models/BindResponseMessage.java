@@ -23,6 +23,10 @@ public class BindResponseMessage {
     }
 
     public boolean isBinded() {
+        return "1".equals(code);
+    }
+
+    public boolean isUnbind() {
         return "0".equals(code);
     }
 }
