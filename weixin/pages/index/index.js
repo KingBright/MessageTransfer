@@ -3,8 +3,9 @@
 var app = getApp()
 Page({
     data: {
-        message: '尚未跟手机绑定',
-        button: '确认绑定',
+        bind_state:false,
+        unbind_message: '尚未跟手机绑定',
+        unbind_button: '去绑定',
         userInfo: {}
     },
     //事件处理函数
@@ -13,7 +14,12 @@ Page({
             url: '../bind/bind'
         })
     },
-    doBind: function() {
+    example: function () {
+        wx.navigateTo({
+            url: '../../example/index'
+        })
+    },
+    checkBindState: function() {
         console.log(typeof app.sendMessage)
         app.sendMesssage("{}")
     },

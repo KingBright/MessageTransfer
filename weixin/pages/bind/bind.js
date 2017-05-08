@@ -2,8 +2,12 @@ var app = getApp()
 Page({
     data: {},
     doBind: function() {
-        console.log(typeof app.sendMessage)
-        app.sendMesssage("{}")
+        bindInfo ={
+            type:21,
+            source:1,
+            message:{}
+        }
+        app.enqueueMsg("{}")
     },
     onLoad: function () {
         this.setData({})
