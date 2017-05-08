@@ -17,6 +17,11 @@ def get_sms_message(json):
     return sms_message
 
 
+def get_login_message(json):
+    login_message = Pson.to_obj(json, LoginMessage)
+    return login_message
+
+
 def build_bind_response_message(code, msg=""):
     bind_out_message = BindResponseMessage(code, msg)
     wrapper_message = WrapperMessage()

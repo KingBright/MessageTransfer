@@ -96,3 +96,4 @@ ENV/
 .ropeproject
 .db
 *.db
+/config.yaml

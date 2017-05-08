@@ -2,6 +2,7 @@ from MessageTransferProtocal import *
 import MessageFactory
 import BindService
 import SmsService
+import WXDecryptService
 
 
 def handle_phone_bind_request(send, message):
@@ -18,13 +19,18 @@ def handle_weixin_bind_request(send, message):
 
 def handle_sms_request(send, message):
     result, msg = SmsService.add_new_sms(message)
-    if result:
+    if result is True:
         code = 0
     else:
         code = -1
 
     response_message = MessageFactory.build_sms_response_message(message.sign, code, msg)
     send(response_message)
+
+
+def handle_weixin_login_request(send, message):
+    WXDecryptService.decrypt(message.code, message.encryptedData, message.iv)
+    pass
 
 
 def handle(send, data):
@@ -46,5 +52,10 @@ def handle(send, data):
             handle_sms_request(send, MessageFactory.get_sms_message(wrapper_message.message))
         elif message_source is Source.WeiXin:
             pass
+    elif message_type is Type.Login:
+        if message_source == Source.WeiXin:
+            print(wrapper_message.message)
+            handle_weixin_login_request(send,
+                                        MessageFactory.get_login_message(wrapper_message.message))
     else:
         print("unrecognized type:", message_type)

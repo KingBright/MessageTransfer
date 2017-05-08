@@ -7,6 +7,9 @@ def to_json(obj):
 
 def to_obj(json_str, cls):
     instance = cls()
-    _dict = json.loads(json_str)
+    if type(json_str) is not dict:
+        _dict = json.loads(json_str)
+    else:
+        _dict = json_str
     instance.__dict__.update(_dict)
     return instance

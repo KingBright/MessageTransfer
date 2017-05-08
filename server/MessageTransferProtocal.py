@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class Type(Enum):
+    Login = 11
+    Login_Response = 12
     Bind = 21
     Bind_Response = 22
     Sms = 31
@@ -13,6 +15,8 @@ class Type(Enum):
             return Type.Bind
         elif type_code == 31:
             return Type.Sms
+        elif type_code == 11:
+            return Type.Login
         else:
             return None
 
@@ -74,3 +78,20 @@ class SmsResponseMessage(object):
         self.sign = sign
         self.code = code
         self.msg = msg
+
+
+class LoginMessage(object):
+    def __init__(self):
+        self.code = None
+        self.rawData = None
+        # 使用 sha1( rawData + sessionkey ) 得到字符串，用于校验用户信息，参考文档 signature。
+        self.signature = None
+        # 包括敏感数据在内的完整用户信息的加密数据，详细见加密数据解密算法
+        self.encryptedData = None
+        # 加密算法的初始向量
+        self.iv = None
+
+
+class LoginResponseMessage(object):
+    def __init__(self, session):
+        self.session = session
